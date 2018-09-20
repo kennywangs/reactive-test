@@ -1,0 +1,19 @@
+server:
+  port: 8080
+  error:
+    path: /error
+spring:
+  # mongo
+  data:
+    mongodb:
+      uri: mongodb://root:rootken@39.108.127.68:27017/ken
+      connections-per-host: 20
+      min-connections-per-host: 20
+      option:
+        threads-allowed-to-block-for-connection-multiplier: 10
+        socket-timeout: 0
+        heartbeat-socket-timeout: 20000
+        heartbeat-connect-timeout: 20000
+        heartbeat-frequency: 10000
+  profiles:
+    active: 
