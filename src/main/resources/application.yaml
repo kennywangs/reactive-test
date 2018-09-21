@@ -6,7 +6,7 @@ spring:
   # mongo
   data:
     mongodb:
-      uri: mongodb://root:rootken@39.108.127.68:27017/ken
+      uri: mongodb://appboot:baiduyun@106.12.103.25:27017/appboot
       connections-per-host: 20
       min-connections-per-host: 20
       option:
@@ -15,5 +15,9 @@ spring:
         heartbeat-socket-timeout: 20000
         heartbeat-connect-timeout: 20000
         heartbeat-frequency: 10000
-  profiles:
-    active: 
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: NON_NULL
+#  profiles:
+#    active: 
