@@ -89,26 +89,21 @@ public class TestController {
 		return this.testService.findAll().delayElements(Duration.ofSeconds(2));
 	}
 	
-	@PostMapping(path = "/reactor/test/event", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public Mono<Void> loadEvents(@RequestBody TestEvent event) {
-//		Flux<TestEvent> es = events.map(s->{
-//			logger.info(s);
-//			return JSON.parseObject(s, TestEvent.class);
-//		});
-		logger.info(JSON.toJSONString(event));
-		return this.eventRepo.insert(event).then();
-	}
-
-//	@PostMapping(path = "/reactor/test/event", consumes = MediaType.APPLICATION_STREAM_JSON_VALUE)
-//	public Mono<Void> loadEvents(@RequestBody String events) {
+//	@PostMapping(path = "/reactor/test/event", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//	public Mono<Void> loadEvents(@RequestBody TestEvent event) {
 ////		Flux<TestEvent> es = events.map(s->{
 ////			logger.info(s);
 ////			return JSON.parseObject(s, TestEvent.class);
 ////		});
-//		logger.info(events);
-//		TestEvent es = JSON.parseObject(events, TestEvent.class);
-//		return this.eventRepo.insert(es).then();
+//		logger.info(JSON.toJSONString(event));
+//		return this.eventRepo.insert(event).then();
 //	}
+
+//	@PostMapping(path = "/reactor/test/event", consumes = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	@PostMapping(path = "/reactor/test/event")
+	public Mono<Void> loadEvents(@RequestBody Flux<TestEvent> events) {
+		return this.eventRepo.insert(events).then();
+	}
 
 	@GetMapping(path = "/reactor/test/event", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<TestEvent> getEvents() {

@@ -1,6 +1,7 @@
 package com.xxb.reactive;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Date;
 
@@ -12,6 +13,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import org.springframework.web.reactive.socket.client.WebSocketClient;
 
 import com.alibaba.fastjson.JSON;
 import com.xxb.reactive.test.entity.TestEvent;
@@ -23,7 +27,8 @@ public class WebClientTest {
 	public static void main(String[] args) throws Exception {
 		WebClientTest test = new WebClientTest();
 		// test.webClientTest2();
-		test.sendMsgs();
+		// test.sendMsgs();
+		test.wsclientSend();
 	}
 
 	public void webClientTest2() throws InterruptedException {
@@ -44,28 +49,24 @@ public class WebClientTest {
 	}
 
 	public void sendMsgs() throws InterruptedException {
-		Flux.interval(Duration.ofSeconds(1)).map(l -> {
+		Flux<TestEvent> eventFlux = Flux.interval(Duration.ofSeconds(1)).map(l -> {
 			TestEvent e = new TestEvent();
 			e.setCreateAt(new Date());
 			e.setMessage("message-" + l);
-			sendTestMsg(e);
+			// sendTestMsg(e);
 			return e;
-		}).take(100).blockLast();
-//		Thread.sleep(TimeUnit.SECONDS.toMillis(10));
-		// WebClient.create("http://localhost:8080")
-		// .post().uri("/reactor/test/event")
-		// .contentType(MediaType.APPLICATION_STREAM_JSON)
-		// .body(eventFlux, TestEvent.class)
-		// .retrieve()
-		// .bodyToMono(Void.class)
-		// .block();
+		}).take(5);
+		// Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+		WebClient.create("http://localhost:8080").post().uri("/reactor/test/event")
+				.contentType(MediaType.APPLICATION_STREAM_JSON).body(eventFlux, TestEvent.class).retrieve()
+				.bodyToMono(Void.class).block();
 	}
-	
+
 	private void sendTestMsg(TestEvent e) {
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost("http://localhost:8080/reactor/test/event");
 		httpPost.addHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-		StringEntity s = new StringEntity(JSON.toJSONString(e),"UTF-8");
+		StringEntity s = new StringEntity(JSON.toJSONString(e), "UTF-8");
 		httpPost.setEntity(s);
 		CloseableHttpResponse response = null;
 		try {
@@ -81,11 +82,13 @@ public class WebClientTest {
 		}
 		System.out.println("send message::error");
 	}
-	
+
 	private static void closeHttpClient(CloseableHttpClient httpClient, CloseableHttpResponse response) {
 		try {
-			if (response!=null) response.close();
-			if (httpClient!=null) httpClient.close();
+			if (response != null)
+				response.close();
+			if (httpClient != null)
+				httpClient.close();
 		} catch (IOException e) {
 			System.out.println("closeHttpClient error:");
 		}
@@ -104,6 +107,26 @@ public class WebClientTest {
 		// e.setMessage("message-" + System.currentTimeMillis());
 		WebClient.create("http://localhost:8080").post().uri("/reactor/test/event")
 				.contentType(MediaType.APPLICATION_JSON_UTF8).syncBody(e).retrieve().bodyToMono(Void.class).block();
+	}
+
+	private void wsclientSend() {
+		final WebSocketClient client = new ReactorNettyWebSocketClient();
+//		 client.execute(URI.create("ws://localhost:8080/testws"), session ->
+//		 Flux.interval(Duration.ofSeconds(1)).map(l -> {
+//		 return session.send(Flux.just(session.textMessage("你好"+l))).thenMany(session.receive().take(1).map(WebSocketMessage::getPayloadAsText));
+//		 }).then()).block();
+//		for (int i=0;i<5;i++) {
+//			client.execute(URI.create("ws://localhost:8080/testws"),
+//					session -> session.send(Flux.just(session.textMessage("你好"+System.currentTimeMillis())))
+//					.thenMany(session.receive().take(1).map(WebSocketMessage::getPayloadAsText))
+//					.doOnNext(msg->{System.out.println("receive:"+msg);}).then())
+//			.block();
+//		}
+		client.execute(URI.create("ws://localhost:8080/testws"),
+				session -> session.send(Flux.interval(Duration.ofSeconds(1)).map(l -> {return session.textMessage("你好"+l);}).take(5))
+				.thenMany(session.receive().take(5).map(WebSocketMessage::getPayloadAsText))
+				.doOnNext(msg->{System.out.println("receive:"+msg);}).then())
+		.block();
 	}
 
 }

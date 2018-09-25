@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,7 +28,7 @@ public class App {
 		Stream.of(args).forEach(arg -> {
 			logger.info("command arg:{}",arg);
 		});
-		new SpringApplicationBuilder(App.class).run(args);
+		new SpringApplicationBuilder(App.class).bannerMode(Banner.Mode.OFF).run(args);
 	}
 
 }
