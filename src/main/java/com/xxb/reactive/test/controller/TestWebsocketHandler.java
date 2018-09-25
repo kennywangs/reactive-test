@@ -11,6 +11,7 @@ public class TestWebsocketHandler implements WebSocketHandler {
 	@Override
 	public Mono<Void> handle(WebSocketSession webSocketSession) {
 		return webSocketSession.send(webSocketSession.receive().map(msg -> {
+			// body 貌似只能拿一次，会被清空，
 			String ret = "data: " + msg.getPayloadAsText();
 			System.out.println(ret);
 			return webSocketSession.textMessage(ret);

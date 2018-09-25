@@ -111,10 +111,12 @@ public class WebClientTest {
 
 	private void wsclientSend() {
 		final WebSocketClient client = new ReactorNettyWebSocketClient();
-//		 client.execute(URI.create("ws://localhost:8080/testws"), session ->
-//		 Flux.interval(Duration.ofSeconds(1)).map(l -> {
-//		 return session.send(Flux.just(session.textMessage("你好"+l))).thenMany(session.receive().take(1).map(WebSocketMessage::getPayloadAsText));
-//		 }).then()).block();
+//		client.execute(URI.create("ws://localhost:8080/testws"),
+//				session -> session.receive().take(5).map(WebSocketMessage::getPayloadAsText).doOnNext(msg->{System.out.println("receive:"+msg);}).then())
+//		.block();
+//		client.execute(URI.create("ws://localhost:8080/testws"),
+//				session -> session.send(Flux.interval(Duration.ofSeconds(1)).map(l -> {return session.textMessage("你好"+l);}).take(5)))
+//		.block();
 //		for (int i=0;i<5;i++) {
 //			client.execute(URI.create("ws://localhost:8080/testws"),
 //					session -> session.send(Flux.just(session.textMessage("你好"+System.currentTimeMillis())))
@@ -124,7 +126,7 @@ public class WebClientTest {
 //		}
 		client.execute(URI.create("ws://localhost:8080/testws"),
 				session -> session.send(Flux.interval(Duration.ofSeconds(1)).map(l -> {return session.textMessage("你好"+l);}).take(5))
-				.thenMany(session.receive().take(5).map(WebSocketMessage::getPayloadAsText))
+				.thenMany(session.receive().take(Duration.ofSeconds(10)).map(WebSocketMessage::getPayloadAsText))
 				.doOnNext(msg->{System.out.println("receive:"+msg);}).then())
 		.block();
 	}
