@@ -15,6 +15,12 @@ spring:
         heartbeat-socket-timeout: 20000
         heartbeat-connect-timeout: 20000
         heartbeat-frequency: 10000
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    password: 
+    timeout: 5000
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
