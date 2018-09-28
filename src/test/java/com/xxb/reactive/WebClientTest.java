@@ -28,7 +28,7 @@ public class WebClientTest {
 		WebClientTest test = new WebClientTest();
 		// test.webClientTest2();
 		// test.sendMsgs();
-		test.wsclientSend();
+		test.wsclient();
 	}
 
 	public void webClientTest2() throws InterruptedException {
@@ -126,9 +126,23 @@ public class WebClientTest {
 //		}
 		client.execute(URI.create("ws://localhost:8080/testws"),
 				session -> session.send(Flux.interval(Duration.ofSeconds(1)).map(l -> {return session.textMessage("你好"+l);}).take(5))
-				.thenMany(session.receive().take(Duration.ofSeconds(10)).map(WebSocketMessage::getPayloadAsText))
-				.doOnNext(msg->{System.out.println("receive:"+msg);}).then())
+//				.thenMany(session.receive().take(Duration.ofSeconds(10)).map(WebSocketMessage::getPayloadAsText))
+//				.doOnNext(msg->{System.out.println("receive:"+msg);})
+				.then())
 		.block();
+	}
+	
+	private void wsclient() {
+		Thread rcvThread = new Thread(()->{
+			final WebSocketClient client = new ReactorNettyWebSocketClient();
+			client.execute(URI.create("ws://localhost:8080/testws"),session -> session.receive().map(WebSocketMessage::getPayloadAsText)
+					.doOnNext(msg->{System.out.println("receive:"+msg);}).then()).block();
+		});
+		rcvThread.start();
+		Thread sendThread = new Thread(()->{
+			wsclientSend();
+		});
+		sendThread.start();
 	}
 
 }

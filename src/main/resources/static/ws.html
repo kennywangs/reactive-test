@@ -1,0 +1,42 @@
+<html>
+
+<head>
+</head>
+
+<body>
+	test page
+	<input id="msg" type="text">
+	<input id="msgButton" type="button" value="send" onClick="sendMsg()">
+	<script type="text/javascript">
+		//var source=new EventSource("/hellosse");
+		var count=0;
+		/* source.onmessage=function(event){
+			console.log(event.data);
+			count++;
+			if (count>10){
+				source.close();
+			}
+		}; */
+		var ws = new WebSocket("ws://localhost:8080/testws");
+		ws.onopen = function() {
+		  console.log("open");
+		  ws.send("hello");
+		};
+		ws.onmessage = function(evt) {
+		  console.log(evt.data)
+		};
+		ws.onclose = function(evt) {
+		  console.log("WebSocketClosed!");
+		};
+		ws.onerror = function(evt) {
+		  console.log("WebSocketError!");
+		};
+		function sendMsg(){
+			var msg = document.getElementById("msg").value;
+			ws.send(msg);
+		};
+		
+	</script>
+</body>
+
+</html>

@@ -49,7 +49,7 @@ public class TestController {
 		return mono;
 	}
 
-	@GetMapping(value = "/hellosse", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	@GetMapping(value = "/hellosse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public Flux<TestEvent> testsse() {
 		JSONObject json = new JSONObject();
 		json.put("date", new Date());
@@ -107,7 +107,8 @@ public class TestController {
 
 	@GetMapping(path = "/reactor/test/event", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<TestEvent> getEvents() {
-		return this.eventRepo.findBy().doOnComplete(()->{logger.info("finished------");});
+//		return this.eventRepo.findBy().doOnComplete(()->{logger.info("finished------");});
+		return this.eventRepo.findWithTailableCursorBy().doOnComplete(()->{logger.info("finished------");});
 	}
 
 }
