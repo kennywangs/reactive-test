@@ -11,6 +11,8 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
+import reactor.core.publisher.UnicastProcessor;
+
 @Configuration
 public class TestWebsocketConfig {
 	@Bean
@@ -41,4 +43,9 @@ public class TestWebsocketConfig {
 	public WebSocketHandlerAdapter handlerAdapter() {
 		return new WebSocketHandlerAdapter();
 	}
+	
+//	@Bean
+//	public UnicastProcessor<String> messagePublisher(){
+//		return UnicastProcessor.create();
+//	}
 }

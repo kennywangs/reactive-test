@@ -12,6 +12,6 @@ public interface TestEventRepository extends ReactiveMongoRepository<TestEvent, 
 	
 	@Tailable
 //	Flux<TestEvent> findBy();
-	Flux<TestEvent> findWithTailableCursorBy();
+	public Flux<TestEvent> findWithTailableCursorBy();
 
 }

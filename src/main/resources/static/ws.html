@@ -17,23 +17,30 @@
 				source.close();
 			}
 		}; */
+		var info;
 		var ws = new WebSocket("ws://localhost:8080/testws");
 		ws.onopen = function() {
 		  console.log("open");
-		  ws.send("hello");
+		  var msg = {event:"userlist"};
+		  ws.send(JSON.stringify(msg));
 		};
 		ws.onmessage = function(evt) {
-		  console.log(evt.data)
+			var msg = JSON.parse(evt.data);
+			if (msg.event=="userlist"){
+				info = msg;
+			}
+			console.log(evt.data)
 		};
 		ws.onclose = function(evt) {
-		  console.log("WebSocketClosed!");
+			console.log("WebSocketClosed!");
 		};
 		ws.onerror = function(evt) {
-		  console.log("WebSocketError!");
+			console.log("WebSocketError!");
 		};
 		function sendMsg(){
-			var msg = document.getElementById("msg").value;
-			ws.send(msg);
+			var payload = document.getElementById("msg").value;
+			var msg = {event:"message",payload:payload,from:info.from,to:info.payload[0]};
+			ws.send(JSON.stringify(msg));
 		};
 		
 	</script>
